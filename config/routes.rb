@@ -15,6 +15,9 @@ Rails.application.routes.draw do
       post "/sleep-records/clock-in/:user_id", to: "sleep_records#clock_in", as: :clock_in
       patch "/sleep-records/wake-up/:user_id", to: "sleep_records#wake_up", as: :wake_up
       get "/sleep-records", to: "sleep_records#index", as: :sleep_records
+
+      post "/users/:user_id/follow/:followed_user_id", to: "users#follow", as: :follow
+      delete "/users/:user_id/unfollow/:followed_user_id", to: "users#unfollow", as: :unfollow
     end
   end
 end
