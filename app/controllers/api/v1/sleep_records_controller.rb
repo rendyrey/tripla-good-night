@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::V1::SleepRecordsController < ApplicationController
-  before_action :find_user, only: %i[clock_in wake_up]
+  before_action :find_user, only: %i[clock_in wake_up following_sleep_records]
   rescue_from CustomError::SleepRecordActive, with: :handle_active_sleep_record
   rescue_from CustomError::SleepRecordNotFound, with: :handle_sleep_record_not_found
 
@@ -24,10 +24,26 @@ class Api::V1::SleepRecordsController < ApplicationController
   end
 
   def wake_up
-    sleep_recod_updated = @user.active_sleep_record&.update(wake_at: DateTime.now)
-    raise CustomError::SleepRecordNotFound if sleep_recod_updated.nil? # raise error if there's no active sleep record
+    ActiveRecord::Base.transaction do
+      active_sleep_record = SleepRecord.lock.find_by(user_id: @user.id, wake_at: nil)
+      sleep_record_updated = active_sleep_record&.update(wake_at: DateTime.now)
+      raise CustomError::SleepRecordNotFound if sleep_record_updated.nil? # raise error if there's no active sleep record
+    end
 
     render json: { message: "Successfully clocked out/wake up" }, status: :ok
+  end
+
+  def following_sleep_records
+    followed_user_ids = @user.followings.pluck(:followed_user_id)
+    sleep_records = SleepRecord.where(user_id: followed_user_ids)
+      .previous_week
+      .sort_by(&:duration)
+
+    sleep_records = sleep_records.map do |sleep_record|
+      sleep_record.as_json.merge(duration: sleep_record.duration)
+    end
+
+    render json: sleep_records, status: :ok
   end
 
   private

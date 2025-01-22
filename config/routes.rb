@@ -12,12 +12,17 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      post "/sleep-records/clock-in/:user_id", to: "sleep_records#clock_in", as: :clock_in
-      patch "/sleep-records/wake-up/:user_id", to: "sleep_records#wake_up", as: :wake_up
-      get "/sleep-records", to: "sleep_records#index", as: :sleep_records
+      scope "sleep-records" do
+        post "clock-in/:user_id", to: "sleep_records#clock_in", as: :clock_in
+        patch "wake-up/:user_id", to: "sleep_records#wake_up", as: :wake_up
+        get "", to: "sleep_records#index", as: :sleep_records
+        get ":user_id", to: "sleep_records#following_sleep_records", as: :following_sleep_records
+      end
 
-      post "/users/:user_id/follow/:followed_user_id", to: "users#follow", as: :follow
-      delete "/users/:user_id/unfollow/:followed_user_id", to: "users#unfollow", as: :unfollow
+      scope "users" do
+        post ":user_id/follow/:followed_user_id", to: "users#follow", as: :follow
+        delete ":user_id/unfollow/:followed_user_id", to: "users#unfollow", as: :unfollow
+      end
     end
   end
 end
