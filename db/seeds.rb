@@ -9,3 +9,22 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+require "faker"
+
+SleepRecord.destroy_all
+User.destroy_all
+
+10.times do
+  User.create(
+    name: Faker::Name.name
+  )
+end
+
+50.times do
+  SleepRecord.create(
+    user: User.all.sample,
+    sleep_at: Faker::Time.between(from: DateTime.now - 10.hours, to: DateTime.now),
+    wake_at: Faker::Time.between(from: DateTime.now - 10.hours, to: DateTime.now)
+  )
+end

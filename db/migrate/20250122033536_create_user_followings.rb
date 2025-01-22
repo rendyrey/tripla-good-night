@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateUserFollowings < ActiveRecord::Migration[8.0]
   def change
     create_table :user_followings do |t|
