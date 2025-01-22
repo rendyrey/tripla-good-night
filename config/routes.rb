@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       post "/sleep-records/clock-in/:user_id", to: "sleep_records#clock_in", as: :clock_in
+      patch "/sleep-records/wake-up/:user_id", to: "sleep_records#wake_up", as: :wake_up
       get "/sleep-records", to: "sleep_records#index", as: :sleep_records
     end
   end
