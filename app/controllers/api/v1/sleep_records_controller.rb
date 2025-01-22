@@ -18,19 +18,23 @@ class Api::V1::SleepRecordsController < ApplicationController
 
     # 1. Clock in operation, and return all clocked-in times, ordered by created_time
     render json: {
-      user: @user.as_json(except: [:created_at, :updated_at]),
-      clocked_in_times: clocked_in_times
+      message: "Successfully clocked in",
+      data: {
+        user: @user.as_json(except: [:created_at, :updated_at]),
+        clocked_in_times: clocked_in_times
+      }
     }, status: :created
   end
 
   def wake_up
+    active_sleep_record = nil
     ActiveRecord::Base.transaction do
       active_sleep_record = SleepRecord.lock.find_by(user_id: @user.id, wake_at: nil)
       sleep_record_updated = active_sleep_record&.update(wake_at: DateTime.now)
       raise CustomError::SleepRecordNotFound if sleep_record_updated.nil? # raise error if there's no active sleep record
     end
 
-    render json: { message: "Successfully clocked out/wake up" }, status: :ok
+    render json: { message: "Successfully clocked out/wake up", data: active_sleep_record }, status: :ok
   end
 
   def following_sleep_records
@@ -39,7 +43,7 @@ class Api::V1::SleepRecordsController < ApplicationController
       .previous_week
       .sort_by(&:duration)
 
-    sleep_records = sleep_records.map do |sleep_record|
+    sleep_records.map! do |sleep_record|
       sleep_record.as_json.merge(duration: sleep_record.duration)
     end
 

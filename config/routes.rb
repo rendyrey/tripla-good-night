@@ -16,7 +16,7 @@ Rails.application.routes.draw do
         post "clock-in/:user_id", to: "sleep_records#clock_in", as: :clock_in
         patch "wake-up/:user_id", to: "sleep_records#wake_up", as: :wake_up
         get "", to: "sleep_records#index", as: :sleep_records
-        get ":user_id", to: "sleep_records#following_sleep_records", as: :following_sleep_records
+        get "following-sleep-records/:user_id", to: "sleep_records#following_sleep_records", as: :following_sleep_records
       end
 
       scope "users" do
