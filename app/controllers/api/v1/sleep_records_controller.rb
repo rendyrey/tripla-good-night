@@ -6,9 +6,27 @@ class Api::V1::SleepRecordsController < ApplicationController
   rescue_from Errors::CustomError::SleepRecordNotFound, with: :handle_sleep_record_not_found
 
   def index
-    sleep_records = SleepRecord.order(created_at: :asc)
+    page_param = params[:page]
+    if page_param.blank?
+      render json: { error: "page parameter is required" }, status: :unprocessable_entity
+      return
+    end
 
-    render json: sleep_records, status: :ok
+    per_page = params[:per_page] || 10
+    sleep_records = SleepRecord.order(created_at: :asc).page(page_param).per(per_page)
+    current_page = sleep_records.current_page
+    total_pages = sleep_records.total_pages
+
+    render json: {
+      meta: {
+        total_pages: sleep_records.total_pages,
+        current_page: sleep_records.current_page,
+        next_page: next_page_link(current_page, total_pages, per_page),
+        prev_page: prev_page_link(current_page, per_page),
+        total_count: sleep_records.total_count
+      },
+      data: sleep_records
+    }, status: :ok
   end
 
   def clock_in
@@ -63,5 +81,17 @@ class Api::V1::SleepRecordsController < ApplicationController
 
     def handle_sleep_record_not_found
       render json: { error: "Active sleep record not found" }, status: :not_found
+    end
+
+    def next_page_link(current_page, total_pages, per_page)
+      return nil if current_page >= total_pages
+
+      url_for(controller: controller_name, action: action_name, page: current_page + 1, per_page: per_page)
+    end
+
+    def prev_page_link(current_page, per_page)
+      return nil if current_page <= 1
+
+      url_for(controller: controller_name, action: action_name, page: current_page - 1, per_page: per_page)
     end
 end
