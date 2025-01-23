@@ -9,14 +9,14 @@ RSpec.describe "Api::V1::SleepRecords", type: :request do
     let!(:sleep_record_3) { create(:sleep_record) }
 
     it "should return all sleep records ordered by created_at" do
-      get "/api/v1/sleep-records"
+      get "/api/v1/sleep-records?page=1"
 
       expect(response).to have_http_status(:ok)
       sleep_records = JSON.parse(response.body)
-      expect(sleep_records).to match_array([sleep_record_1.as_json, sleep_record_2.as_json, sleep_record_3.as_json])
-      expect(sleep_records.count).to eq(3)
-      expect(sleep_records.first['id']).to eq(sleep_record_1.id)
-      expect(sleep_records.last['id']).to eq(sleep_record_3.id)
+      expect(sleep_records['data']).to match_array([sleep_record_1.as_json, sleep_record_2.as_json, sleep_record_3.as_json])
+      expect(sleep_records['data'].count).to eq(3)
+      expect(sleep_records['data'].first['id']).to eq(sleep_record_1.id)
+      expect(sleep_records['data'].last['id']).to eq(sleep_record_3.id)
     end
   end
 

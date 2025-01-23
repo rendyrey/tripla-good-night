@@ -94,12 +94,23 @@
 
 ### Get All Sleep Records
 
-- URL: `GET /api/v1/sleep_records`
+- URL: `GET /api/v1/sleep_records?page=1&per_page=10`
+- Query Params:
+  - `page` (required): The page number of the list of sleep records to retrieve.
+  - `per_page` (optional): The number of sleep records per page. Defaults to 10 if not provided.
 - Description: Retrieves all sleep records of all users, ordered by their creation time.
 - Response: Return list of sleep records
 - Response Example:
 ```json
-[
+{
+  "meta": {
+      "total_pages": 6,
+      "current_page": 1,
+      "next_page": "http://localhost:3000/api/v1/sleep-records?page=2&per_page=10",
+      "prev_page": null,
+      "total_count": 52
+  },
+  "data": [
     {
         "id": 1,
         "user_id": 9,
@@ -117,7 +128,8 @@
         "updated_at": "2025-01-23T08:00:57.426Z"
     },
     ...
-]
+  ]
+}
 ```
 
 ### Get Following Users' Sleep Records
