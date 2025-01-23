@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module CustomError
+module Errors::CustomError
   class UserNotFound < StandardError
     def initialize(message = "User not found")
       super

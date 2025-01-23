@@ -5,5 +5,5 @@ require "errors/custom_error"
 
 class ApplicationController < ActionController::API
   include UserConcern
-  include CustomError
+  include Errors::CustomError
 end

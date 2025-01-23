@@ -2,8 +2,8 @@
 
 class Api::V1::SleepRecordsController < ApplicationController
   before_action :find_user, only: %i[clock_in wake_up following_sleep_records]
-  rescue_from CustomError::SleepRecordActive, with: :handle_active_sleep_record
-  rescue_from CustomError::SleepRecordNotFound, with: :handle_sleep_record_not_found
+  rescue_from Errors::CustomError::SleepRecordActive, with: :handle_active_sleep_record
+  rescue_from Errors::CustomError::SleepRecordNotFound, with: :handle_sleep_record_not_found
 
   def index
     sleep_records = SleepRecord.order(created_at: :asc)
@@ -26,12 +26,13 @@ class Api::V1::SleepRecordsController < ApplicationController
     }, status: :created
   end
 
+
   def wake_up
     active_sleep_record = nil
     ActiveRecord::Base.transaction do
       active_sleep_record = SleepRecord.lock.find_by(user_id: @user.id, wake_at: nil)
       sleep_record_updated = active_sleep_record&.update(wake_at: DateTime.now)
-      raise CustomError::SleepRecordNotFound if sleep_record_updated.nil? # raise error if there's no active sleep record
+      raise Errors::CustomError::SleepRecordNotFound if sleep_record_updated.nil? # raise error if there's no active sleep record
     end
 
     render json: { message: "Successfully clocked out/wake up", data: active_sleep_record }, status: :ok
@@ -53,7 +54,7 @@ class Api::V1::SleepRecordsController < ApplicationController
   private
     def check_active_sleep
       sleep_record = @user.sleep_records.where(wake_at: nil).first
-      raise CustomError::SleepRecordActive if sleep_record.present?
+      raise Errors::CustomError::SleepRecordActive if sleep_record.present?
     end
 
     def handle_active_sleep_record

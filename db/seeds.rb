@@ -25,6 +25,6 @@ end
   SleepRecord.create(
     user: User.all.sample,
     sleep_at: Faker::Time.between(from: DateTime.now - 10.hours, to: DateTime.now),
-    wake_at: Faker::Time.between(from: DateTime.now - 10.hours, to: DateTime.now)
+    wake_at: Faker::Time.between(from: DateTime.now, to: DateTime.now + 10.hours)
   )
 end
