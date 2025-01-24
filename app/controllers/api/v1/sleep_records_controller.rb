@@ -62,10 +62,6 @@ class Api::V1::SleepRecordsController < ApplicationController
       .previous_week
       .sort_by(&:duration)
 
-    sleep_records.map! do |sleep_record|
-      sleep_record.as_json.merge(duration: sleep_record.duration)
-    end
-
     render json: sleep_records, status: :ok
   end
 

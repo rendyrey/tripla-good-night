@@ -4,6 +4,11 @@ class Api::V1::UsersController < ApplicationController
   before_action :find_user, only: %i[follow unfollow]
   def follow
     begin
+      if @user.id == params[:followed_user_id].to_i
+        render json: { error: "You cannot follow yourself" }, status: :unprocessable_entity
+        return
+      end
+
       new_following_user = User.find(params[:followed_user_id])
       @user.followings << new_following_user
 

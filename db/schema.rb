@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_01_22_033536) do
+ActiveRecord::Schema[8.0].define(version: 2025_01_24_003942) do
   create_table "sleep_records", force: :cascade do |t|
     t.integer "user_id", null: false
     t.datetime "sleep_at"
     t.datetime "wake_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "duration", default: 0
     t.index ["user_id"], name: "index_sleep_records_on_user_id"
   end
 
